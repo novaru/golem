@@ -1,8 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+
+	"github.com/novaru/golem/config"
+)
 
 func main() {
-	fmt.Println("Golem is a load balancer for HTTP services.")
-	fmt.Println("It is designed to be simple, fast, and easy to use.")
+	cfg, err := config.ParseFlags()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Invalid configuration: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("Parsed config: port=%d, backends=%v, method=%s\n", cfg.Port, cfg.Backends, cfg.Method)
 }
