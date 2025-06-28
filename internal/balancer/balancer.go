@@ -1,0 +1,19 @@
+package balancer
+
+import (
+	"errors"
+)
+
+// Balancer interface for all load balancers
+type Balancer interface {
+	NextBackend() *Backend
+}
+
+func NewBalancer(method string, backends []*Backend) (Balancer, error) {
+	switch method {
+	case "roundrobin":
+		return NewRoundRobinBalancer(backends), nil
+	default:
+		return nil, errors.New("Invalid balancer method: " + method)
+	}
+}
