@@ -11,7 +11,11 @@ func TestBalancerFactory(t *testing.T) {
 	if err != nil || b == nil {
 		t.Errorf("expected roundrobin balancer, got err=%v", err)
 	}
-	b, err = NewBalancer("unknown", backends)
+	b, err = NewBalancer("leastconn", backends)
+	if err != nil || b == nil {
+		t.Errorf("expected leastconn balancer, got err=%v", err)
+	}
+	_, err = NewBalancer("unknown", backends)
 	if err == nil {
 		t.Error("expected error for unknown method")
 	}

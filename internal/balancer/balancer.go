@@ -13,6 +13,8 @@ func NewBalancer(method string, backends []*Backend) (Balancer, error) {
 	switch method {
 	case "roundrobin":
 		return NewRoundRobinBalancer(backends), nil
+	case "leastconn":
+		return NewLeastConnBalancer(backends), nil
 	default:
 		return nil, errors.New("Invalid balancer method: " + method)
 	}
