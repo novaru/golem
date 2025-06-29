@@ -29,9 +29,16 @@ func (s *StringSlice) Set(value string) error {
 	if value == "" {
 		return nil
 	}
-	parts := strings.SplitSeq(value, ",")
-	for part := range parts {
-		*s = append(*s, strings.TrimSpace(part))
+	parts := strings.Split(value, ",")
+	if len(parts) == 0 {
+		return errors.New("no valid values provided")
+	}
+	for _, part := range parts {
+		trimmed := strings.TrimSpace(part)
+		if trimmed == "" {
+			return errors.New("empty value in comma-separated list")
+		}
+		*s = append(*s, trimmed)
 	}
 	return nil
 }

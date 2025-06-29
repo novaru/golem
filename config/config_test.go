@@ -35,14 +35,27 @@ func TestConfigValidation(t *testing.T) {
 
 func TestStringSliceFlag(t *testing.T) {
 	var s StringSlice
-	s.Set("a,b,c")
+	err := s.Set("a,b,c")
+	if err != nil {
+		t.Fatal("error setting values \"a,b,c\"", err)
+	}
+
 	expected := StringSlice{"a", "b", "c"}
 	if !reflect.DeepEqual(s, expected) {
 		t.Errorf("expected %v, got %v", expected, s)
 	}
+
 	s = StringSlice{}
-	s.Set("a")
-	s.Set("b")
+	err = s.Set("a")
+	if err != nil {
+		t.Fatal("error setting values \"a\"", err)
+	}
+
+	err = s.Set("b")
+	if err != nil {
+		t.Fatal("error setting values \"b\"", err)
+	}
+
 	if !reflect.DeepEqual(s, StringSlice{"a", "b"}) {
 		t.Errorf("expected [a b], got %v", s)
 	}
