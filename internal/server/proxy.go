@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/novaru/golem/internal/balancer"
+	"github.com/novaru/golem/internal/metrics"
 )
 
 // ProxyServer is a simple HTTP reverse proxy that uses a load balancer to distribute requests
@@ -29,8 +30,11 @@ func NewProxyServer(bal balancer.Balancer) *ProxyServer {
 // It processes incoming HTTP requests, selects a backend using the load balancer,
 // and forwards the request to the selected backend server.
 func (ps *ProxyServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	startTime := time.Now()
+
 	backend := ps.Balancer.NextBackend()
 	if backend == nil {
+		metrics.RequestFailures.WithLabelValues(backend.URL, r.Method).Inc()
 		http.Error(w, "No healthy backend available", http.StatusServiceUnavailable)
 		return
 	}
@@ -42,6 +46,8 @@ func (ps *ProxyServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	backend.AddConnections()
+	metrics.UpdateActiveConnections(backend.URL, float64(backend.GetConnections()))
+
 	connectionRemoved := false
 
 	// Function to safely remove connection once
@@ -53,7 +59,10 @@ func (ps *ProxyServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	defer removeConnection()
+	defer func() {
+		removeConnection()
+		metrics.UpdateActiveConnections(backend.URL, float64(backend.GetConnections()))
+	}()
 
 	// Log which backend is selected for the request
 	log.Printf("[INFO] Forwarding %s %s to backend: %s (current connections: %d)", r.Method, r.URL.Path, backend.URL, backend.GetConnections())
@@ -82,6 +91,9 @@ func (ps *ProxyServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		removeConnection()
 		http.Error(w, "Backend unavailable", http.StatusBadGateway)
 		backend.SetHealth(false)
+
+		metrics.RequestFailures.WithLabelValues(backend.URL, r.Method, "backend_unavailable").Inc()
+
 		log.Printf("[ERROR] Backend %s is unavailable: %v", backend.URL, err)
 		return
 	}
@@ -100,6 +112,14 @@ func (ps *ProxyServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(resp.StatusCode)
 
 	flusher, supportsFlushing := w.(http.Flusher)
+
+	duration := time.Since(startTime).Seconds()
+	metrics.RecordRequest(
+		backend.URL,
+		r.Method,
+		fmt.Sprintf("%d", resp.StatusCode),
+		duration,
+	)
 
 	// Handle streaming vs regular responses
 	// This simulates a scenario where the backend can return a streaming response
