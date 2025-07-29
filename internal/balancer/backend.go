@@ -2,6 +2,8 @@ package balancer
 
 import (
 	"sync"
+
+	"github.com/novaru/golem/internal/metrics"
 )
 
 // Backend represents a connection to a backend server.
@@ -19,6 +21,7 @@ func (b *Backend) SetHealth(healthy bool) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	b.healthy = healthy
+	metrics.UpdateBackendHealth(b.URL, healthy)
 }
 
 // IsHealthy returns whether the backend is healthy.
@@ -30,6 +33,7 @@ func (b *Backend) IsHealthy() bool {
 
 // NewBackend creates and returns a new Backend instance.
 func NewBackend(url string, weight int) *Backend {
+	metrics.UpdateBackendHealth(url, true)
 	return &Backend{
 		URL:     url,
 		healthy: true,
