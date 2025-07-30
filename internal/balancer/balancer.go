@@ -15,6 +15,8 @@ func NewBalancer(method string, backends []*Backend) (Balancer, error) {
 		return NewRoundRobinBalancer(backends), nil
 	case "leastconn":
 		return NewLeastConnBalancer(backends), nil
+	case "weighted":
+		return NewWeightedResponseTimeBalancer(backends), nil
 	default:
 		return nil, errors.New("Invalid balancer method: " + method)
 	}
