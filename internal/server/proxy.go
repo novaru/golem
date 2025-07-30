@@ -32,8 +32,8 @@ func NewProxyServer(bal balancer.Balancer) *ProxyServer {
 func (ps *ProxyServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	startTime := time.Now()
 
-	backend := ps.Balancer.NextBackend()
-	if backend == nil {
+	backend, err := ps.Balancer.NextBackend()
+	if err != nil {
 		metrics.RequestFailures.WithLabelValues(backend.URL, r.Method).Inc()
 		http.Error(w, "No healthy backend available", http.StatusServiceUnavailable)
 		return

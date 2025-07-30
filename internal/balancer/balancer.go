@@ -6,7 +6,7 @@ import (
 
 // Balancer interface for all load balancers
 type Balancer interface {
-	NextBackend() *Backend
+	NextBackend() (*Backend, error)
 }
 
 func NewBalancer(method string, backends []*Backend) (Balancer, error) {

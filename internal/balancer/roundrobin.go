@@ -1,6 +1,7 @@
 package balancer
 
 import (
+	"errors"
 	"sync/atomic"
 )
 
@@ -18,17 +19,17 @@ func NewRoundRobinBalancer(backends []*Backend) *RoundRobinBalancer {
 // NextBackend returns the next healthy backend in a round-robin fashion
 // (this will forward requests cyclically between servers and skip over
 // unhealthy backends). If no healthy backends are available, it returns nil.
-func (r *RoundRobinBalancer) NextBackend() *Backend {
+func (r *RoundRobinBalancer) NextBackend() (*Backend, error) {
 	n := len(r.backends)
 	if n == 0 {
-		return nil
+		return nil, errors.New("no backends provided")
 	}
 	for range n {
 		idx := int(atomic.AddUint64(&r.index, 1)) % n
 		next := r.backends[idx]
 		if next.IsHealthy() {
-			return next
+			return next, nil
 		}
 	}
-	return nil
+	return nil, errors.New("no healthy backends available")
 }
