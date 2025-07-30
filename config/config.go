@@ -64,7 +64,10 @@ func ParseFlags() (*Config, error) {
 		&cfg.Method,
 		"method",
 		"roundrobin", // Default load balancing method.
-		"Load balancing method (roundrobin, leastconn, weighted)",
+		"Load balancing method:\n"+
+			"  roundrobin\t– Distributes requests in order\n"+
+			"  leastconn\t– Routes to backend with fewest active connections\n"+
+			"  weighted\t– Weighted response time (favors faster backends based on response time)\n",
 	)
 	flag.Parse()
 	return &cfg, cfg.Validate()
