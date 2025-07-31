@@ -26,7 +26,7 @@ jobs:
       
     - name: Start server in background
       run: |
-        go run . &
+        go run ./cmd/golem/main.go &
         echo $! > pid.txt
         sleep 2  # wait for server to start
 
