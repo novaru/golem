@@ -1,0 +1,21 @@
+{
+	"port": 8080,
+	"backends": [
+		{
+			"name": "App 1",
+			"url": "http://localhost:8081",
+			"weight": 1
+		},
+		{
+			"name": "App 2",
+			"url": "http://localhost:8082",
+			"weight": 1
+		},
+		{
+			"name": "App 3",
+			"url": "http://localhost:8083",
+			"weight": 1
+		}
+	],
+	"method": "leastconn"
+}

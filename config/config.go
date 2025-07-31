@@ -88,3 +88,15 @@ func (c *Config) Validate() error {
 	}
 	return nil
 }
+
+func (c *Config) Merge(other *Config) {
+	if other.Port != 0 {
+		c.Port = other.Port
+	}
+	if len(other.Backends) > 0 {
+		c.Backends = other.Backends
+	}
+	if other.Method != "" {
+		c.Method = other.Method
+	}
+}
