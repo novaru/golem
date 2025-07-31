@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -14,18 +15,49 @@ import (
 )
 
 func main() {
-	cfg, err := config.ParseFlags()
-	if err != nil {
+	var cfg *config.Config
+	var backendWeights map[string]int
+	var err error
+
+	configFile, err := config.FindConfigFile()
+	if err == nil {
+		cfg, backendWeights, err = config.LoadConfigFromFile(configFile)
+		if err != nil {
+			log.Fatalf("Failed to load config file %s: %v", configFile, err)
+		}
+		fmt.Printf("Loaded config from %s\n", configFile)
+	} else {
+		backendWeights = make(map[string]int)
+		cfg = &config.Config{
+			Port:     8080,
+			Backends: nil,
+			Method:   "roundrobin",
+		}
+	}
+
+	originalPort := cfg.Port
+	originalMethod := cfg.Method
+
+	// Parse flags (override file)
+	flag.IntVar(&cfg.Port, "port", originalPort, "Port to listen on")
+	flag.Var(&cfg.Backends, "backend", "Backend server URL (comma-separated or repeated)")
+	flag.StringVar(&cfg.Method, "method", originalMethod, "Load balancing method")
+	flag.Parse()
+
+	if err := cfg.Validate(); err != nil {
 		log.Fatalf("Invalid configuration: %v", err)
 	}
 
-	metrics.SetLoadBalancerInfo("v1.0.0", cfg.Method)
-
 	backends := []*balancer.Backend{}
 	for _, url := range cfg.Backends {
-		backend := balancer.NewBackend(url, 1)
-		backends = append(backends, backend)
+		weight := 1
+		if w, found := backendWeights[url]; found {
+			weight = w
+		}
+		backends = append(backends, balancer.NewBackend(url, weight))
 	}
+
+	metrics.SetLoadBalancerInfo("v1.0.0", cfg.Method)
 
 	bal, err := balancer.NewBalancer(cfg.Method, backends)
 	if err != nil {
