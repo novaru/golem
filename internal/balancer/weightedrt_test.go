@@ -256,7 +256,7 @@ func TestWeightedResponseTimeBalancer_CalculateExpectedDistribution(t *testing.T
 	t.Logf("Total weight: %.2f", totalWeight)
 }
 
-// Rest of the test functions remain the same...
+// Test for recording response times and calculating average response time
 func TestWeightedResponseTimeBalancer_RecordResponseTime(t *testing.T) {
 	tests := []struct {
 		name          string

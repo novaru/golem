@@ -61,9 +61,9 @@ func TestLeastConnBalancer_NextBackend(t *testing.T) {
 		}
 
 		balancer := NewLeastConnBalancer(backends)
-		selected := balancer.NextBackend()
+		selected, err := balancer.NextBackend()
 
-		if selected == nil {
+		if err != nil {
 			t.Fatal("expected a backend to be selected, got nil")
 		}
 
@@ -80,7 +80,7 @@ func TestLeastConnBalancer_NextBackend(t *testing.T) {
 		}
 
 		balancer := NewLeastConnBalancer(backends)
-		selected := balancer.NextBackend()
+		selected, _ := balancer.NextBackend()
 
 		if selected == nil {
 			t.Fatal("expected a backend to be selected, got nil")
@@ -98,7 +98,7 @@ func TestLeastConnBalancer_NextBackend(t *testing.T) {
 		}
 
 		balancer := NewLeastConnBalancer(backends)
-		selected := balancer.NextBackend()
+		selected, _ := balancer.NextBackend()
 
 		if selected != nil {
 			t.Errorf("expected nil when no healthy backends, got %v", selected)
@@ -107,7 +107,7 @@ func TestLeastConnBalancer_NextBackend(t *testing.T) {
 
 	t.Run("returns nil when no backends", func(t *testing.T) {
 		balancer := NewLeastConnBalancer([]*Backend{})
-		selected := balancer.NextBackend()
+		selected, _ := balancer.NextBackend()
 
 		if selected != nil {
 			t.Errorf("expected nil when no backends, got %v", selected)
@@ -120,9 +120,9 @@ func TestLeastConnBalancer_NextBackend(t *testing.T) {
 		}
 
 		balancer := NewLeastConnBalancer(backends)
-		selected := balancer.NextBackend()
+		selected, err := balancer.NextBackend()
 
-		if selected == nil {
+		if err != nil {
 			t.Fatal("expected a backend to be selected, got nil")
 		}
 
@@ -140,9 +140,9 @@ func TestLeastConnBalancer_NextBackend(t *testing.T) {
 		}
 
 		balancer := NewLeastConnBalancer(backends)
-		selected := balancer.NextBackend()
+		selected, err := balancer.NextBackend()
 
-		if selected == nil {
+		if err != nil {
 			t.Fatal("expected a backend to be selected, got nil")
 		}
 
@@ -159,9 +159,9 @@ func TestLeastConnBalancer_NextBackend(t *testing.T) {
 		}
 
 		balancer := NewLeastConnBalancer(backends)
-		selected := balancer.NextBackend()
+		selected, err := balancer.NextBackend()
 
-		if selected == nil {
+		if err != nil {
 			t.Fatal("expected a backend to be selected, got nil")
 		}
 

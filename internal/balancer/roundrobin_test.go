@@ -15,7 +15,7 @@ func TestNewRoundRobinBalancer(t *testing.T) {
 		t.Fatal("NewRoundRobinBalancer returned nil")
 	}
 
-	b := rr.NextBackend()
+	b, _ := rr.NextBackend()
 	if b == nil {
 		t.Fatal("NextBackend() returned nil after initialization")
 	}
@@ -30,7 +30,7 @@ func TestRoundRobinSelection(t *testing.T) {
 	rr := NewRoundRobinBalancer(backends)
 	got := []string{}
 	for range 4 {
-		b := rr.NextBackend()
+		b, _ := rr.NextBackend()
 		if b == nil {
 			t.Fatal("NextBackend() returned nil")
 		}
@@ -62,7 +62,7 @@ func TestRoundRobinWithUnhealthy(t *testing.T) {
 	expectedURL := "http://a"
 
 	for i := range 4 {
-		b := rr.NextBackend()
+		b, _ := rr.NextBackend()
 		if b == nil {
 			t.Fatal("NextBackend() returned nil when healthy backend exists")
 		}
@@ -89,7 +89,7 @@ func TestRoundRobinConcurrent(t *testing.T) {
 		wg.Add(1)
 		go func(index int) {
 			defer wg.Done()
-			b := rr.NextBackend()
+			b, _ := rr.NextBackend()
 			if b != nil {
 				results[index] = b.URL
 			}
@@ -115,7 +115,7 @@ func TestRoundRobinConcurrent(t *testing.T) {
 
 func TestRoundRobinEmptyBackends(t *testing.T) {
 	rr := NewRoundRobinBalancer([]*Backend{})
-	b := rr.NextBackend()
+	b, _ := rr.NextBackend()
 	if b != nil {
 		t.Errorf("expected nil for empty backends, got %v", b)
 	}
@@ -123,7 +123,7 @@ func TestRoundRobinEmptyBackends(t *testing.T) {
 
 func TestRoundRobinNilBackends(t *testing.T) {
 	rr := NewRoundRobinBalancer(nil)
-	b := rr.NextBackend()
+	b, _ := rr.NextBackend()
 	if b != nil {
 		t.Errorf("expected nil for nil backends, got %v", b)
 	}
@@ -139,7 +139,7 @@ func TestRoundRobinAllUnhealthy(t *testing.T) {
 	backends[1].SetHealth(false)
 
 	rr := NewRoundRobinBalancer(backends)
-	b := rr.NextBackend()
+	b, _ := rr.NextBackend()
 	if b != nil {
 		t.Errorf("expected nil when all backends unhealthy, got %v", b)
 	}
@@ -154,7 +154,7 @@ func TestRoundRobinSingleBackend(t *testing.T) {
 
 	// Test multiple calls return the same backend
 	for range 4 {
-		b := rr.NextBackend()
+		b, _ := rr.NextBackend()
 		if b == nil {
 			t.Fatal("NextBackend() returned nil")
 		}
@@ -173,8 +173,8 @@ func TestRoundRobinHealthToggling(t *testing.T) {
 
 	rr := NewRoundRobinBalancer(backends)
 
-	b1 := rr.NextBackend()
-	b2 := rr.NextBackend()
+	b1, _ := rr.NextBackend()
+	b2, _ := rr.NextBackend()
 
 	if b1 == nil || b2 == nil {
 		t.Fatal("Expected backends to be available")
@@ -185,7 +185,7 @@ func TestRoundRobinHealthToggling(t *testing.T) {
 
 	// Should only return the healthy one
 	for range 4 {
-		b := rr.NextBackend()
+		b, _ := rr.NextBackend()
 		if b == nil {
 			t.Fatal("NextBackend() returned nil")
 		}
@@ -200,7 +200,7 @@ func TestRoundRobinHealthToggling(t *testing.T) {
 	// Should resume round-robin
 	urls := make(map[string]bool)
 	for range 4 {
-		b := rr.NextBackend()
+		b, _ := rr.NextBackend()
 		if b != nil {
 			urls[b.URL] = true
 		}
