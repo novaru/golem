@@ -31,7 +31,7 @@ jobs:
         sleep 2  # wait for server to start
 
     - name: Test metrics endpoint
-      run: curl --fail http://localhost:8080/metrics
+      run: curl --fail http://localhost:8000/metrics
 
     - name: Cleanup
       run: kill $(cat pid.txt)
