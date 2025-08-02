@@ -20,6 +20,6 @@ COPY --from=builder /app/golem .
 
 COPY config.json /etc/golem/config.json
 
-EXPOSE 8080
+EXPOSE 8000
 
 CMD ["./golem"]

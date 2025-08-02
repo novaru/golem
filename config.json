@@ -1,19 +1,19 @@
 {
-	"port": 8080,
+	"port": 8000,
 	"backends": [
 		{
 			"name": "App 1",
-			"url": "http://localhost:8081",
+			"url": "http://localhost:3001",
 			"weight": 1
 		},
 		{
 			"name": "App 2",
-			"url": "http://localhost:8082",
+			"url": "http://localhost:3002",
 			"weight": 1
 		},
 		{
 			"name": "App 3",
-			"url": "http://localhost:8083",
+			"url": "http://localhost:3003",
 			"weight": 1
 		}
 	],
